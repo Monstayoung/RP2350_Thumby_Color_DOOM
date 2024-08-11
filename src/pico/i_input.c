@@ -118,7 +118,18 @@ int mouse_threshold = 10;
 #endif
 
 enum {
+    SDL_SCANCODE_N = 17,
+    SDL_SCANCODE_Y = 28,
+    SDL_SCANCODE_1 = 30,
+    SDL_SCANCODE_ESCAPE = 41,
+    SDL_SCANCODE_RETURN = 40,
+    SDL_SCANCODE_TAB = 43,
     SDL_SCANCODE_SPACE = 44,
+    SDL_SCANCODE_RIGHT = 79,
+    SDL_SCANCODE_LEFT = 80,
+    SDL_SCANCODE_DOWN = 81,
+    SDL_SCANCODE_UP = 82,
+
     SDL_SCANCODE_LCTRL = 224,
     SDL_SCANCODE_LSHIFT = 225,
     SDL_SCANCODE_LALT = 226, /**< alt, option */
@@ -185,6 +196,8 @@ static int GetLocalizedKey(int scancode)
     }
 }
 
+static int8_t last_ascii; // last ASCII char tped
+
 // Get the equivalent ASCII (Unicode?) character for a keypress.
 int GetTypedChar(int scancode, boolean shiftdown)
 {
@@ -193,6 +206,28 @@ int GetTypedChar(int scancode, boolean shiftdown)
     if (!text_input_enabled)
     {
         return 0;
+    }
+
+    // since we have no keyboard we use an arcade style up/down/left/right
+    if (scancode == SDL_SCANCODE_LEFT) {
+        return 8; // backspace
+    } else if (scancode == SDL_SCANCODE_UP) {
+        last_ascii++;
+        if (last_ascii == 'Z' + 1) {
+            last_ascii = 64;
+        }
+        // lower case for changing
+        return last_ascii + 32;
+    } else if (scancode == SDL_SCANCODE_DOWN) {
+        last_ascii--;
+        if (last_ascii == 63) {
+            last_ascii = 'Z';
+        }
+        // lower case for changing
+        return last_ascii + 32;
+    } else if (scancode == SDL_SCANCODE_RIGHT) {
+        // upper case is to actually type char
+        return last_ascii;
     }
 
     // If we're strictly emulating Vanilla, we should always act like
@@ -276,6 +311,7 @@ void I_StartTextInput(int x1, int y1, int x2, int y2)
 {
     text_input_enabled = true;
 
+    last_ascii = 64; // new input start with SPACE again
     if (!vanilla_keyboard_mapping)
     {
 #if !USE_VANILLA_KEYBOARD_MAPPING_ONLY
@@ -529,7 +565,59 @@ void I_GetEvent() {
     return I_GetEventTimeout(50);
 }
 
+#ifndef NO_USE_UART
+#ifdef DEFCON32_BADGE
+#define NO_USE_UART 1 // not much point as there isn't one
+#endif
+#endif
+
+static const uint8_t bdef[] = {
+        DEFCON32_BADGE_SW_FN_PIN, 0, 0,
+        DEFCON32_BADGE_SW_START_PIN, SDL_SCANCODE_ESCAPE, SDL_SCANCODE_ESCAPE,
+        DEFCON32_BADGE_SW_SELECT_PIN, SDL_SCANCODE_RETURN, SDL_SCANCODE_TAB,
+        DEFCON32_BADGE_SW_LEFT_PIN, SDL_SCANCODE_LEFT, SDL_SCANCODE_1,
+        DEFCON32_BADGE_SW_RIGHT_PIN, SDL_SCANCODE_RIGHT, SDL_SCANCODE_RIGHT,
+        DEFCON32_BADGE_SW_UP_PIN, SDL_SCANCODE_UP, SDL_SCANCODE_Y,
+        DEFCON32_BADGE_SW_DOWN_PIN, SDL_SCANCODE_DOWN, SDL_SCANCODE_N,
+        DEFCON32_BADGE_SW_A_PIN, SDL_SCANCODE_SPACE, SDL_SCANCODE_SPACE,
+        DEFCON32_BADGE_SW_B_PIN, SDL_SCANCODE_LCTRL, SDL_SCANCODE_LCTRL,
+};
+static uint8_t buttons[count_of(bdef)/3];
+static uint8_t keycodex[count_of(bdef)/3];
+#include "hardware/gpio.h"
 void I_GetEventTimeout(int key_timeout) {
+    static int mods;
+    // this is a bit hacky, but just track the state
+    // of each of the keys we care about, and select a different function
+    // when the FN button is pressed
+    for(int i=0;i<count_of(bdef);i+=3) {
+        uint new_sel = !gpio_get(bdef[i]);
+        uint last_sel = buttons[i/3];
+        if (new_sel && !last_sel) {
+            if (bdef[i+1] == SDL_SCANCODE_RSHIFT) mods |= WITH_SHIFT;
+            keycodex[i/3] = bdef[i+1+buttons[0]];
+            // special handling to type 1->9 by repeatedly
+            // pressing FN+LEFT the number of times you want (we press 1, 2, 3, in order)
+            if (keycodex[i/3] == SDL_SCANCODE_1) {
+                static uint64_t last_time;
+                uint64_t now_time = time_us_64();
+                static uint8_t weapon_base;
+                if (now_time - last_time > 1200000) {
+                    weapon_base = 0;
+                }
+                last_time = now_time;
+                keycodex[i/3] = SDL_SCANCODE_1 + weapon_base;
+                if (weapon_base != 7) weapon_base++;
+            }
+            pico_key_down(keycodex[i/3], 0, mods);
+        } else if (!new_sel && last_sel)  {
+            if (bdef[i+1] == SDL_SCANCODE_RSHIFT) mods &= ~WITH_SHIFT;
+            pico_key_up(keycodex[i/3], 0, mods);
+        }
+        buttons[i/3] = new_sel;
+    }
+    extern boolean show_fps;
+    show_fps = buttons[0];
 #if PICO_ON_DEVICE && !NO_USE_UART
     if (uart_is_readable(uart_default)) {
         char c = uart_getc(uart_default);

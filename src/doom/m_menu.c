@@ -1555,7 +1555,9 @@ void M_QuitDOOM(int choice)
     M_StartMessage(endstring,M_QuitResponse,true);
 #else
     // one less \n as M_StartMessage2 adds a newline between
-    M_StartMessage2(M_SelectEndMessage(),M_QuitResponse,true, "\n" DOSY);
+    // note on badge we don't want to quit as we have removed
+    // the DOS mode
+//    M_StartMessage2(M_SelectEndMessage(),M_QuitResponse,true, "\n" DOSY);
 #endif
 }
 
@@ -2013,16 +2015,41 @@ boolean M_Responder (event_t* ev)
             {
                 break;
             }
-            if (vanilla_keyboard_mapping)
-            {
-                ch = ev->data1;
-            }
-            else
-            {
+            // BEGIN some hackery for typing on the keyboardless badge
+            // 1.  we set our key up in GetTypedChar (which ends up in ev->data3)
+//            if (vanilla_keyboard_mapping)
+//            {
+//                ch = ev->data1;
+//            }
+//            else
+//            {
                 ch = ev->data3;
-            }
+//            }
 
-            ch = toupper(ch);
+            // 2. we handle backspace the same way as it would normally be done above
+            if (ch == 8) {
+                // backspace again
+                if (stringEntryIndex > 0) {
+                    stringEntryIndex--;
+                    stringEntryBuffer[stringEntryIndex] = 0;
+                }
+                break;
+            }
+            // 3. if we receive an upper case character or a 64 for SPACE
+            //    that should be typed; if we receive a lower case character
+            //    or 96 for SPACE then that's just been spun using UP/DOWN
+            //    and we replace the existing char
+            int och;
+            if (ch == 64 || ch == 96) {
+                och = ch == 64 ? ' ' : 0;
+                ch = ' ';
+            } else {
+                och = ch;
+                ch = toupper(ch);
+            }
+            if (och != ch && stringEntryIndex) {
+                stringEntryIndex--;
+            }
 
             if (ch != ' '
              && (ch - HU_FONTSTART < 0 || ch - HU_FONTSTART >= HU_FONTSIZE))
