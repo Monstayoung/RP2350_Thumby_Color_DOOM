@@ -1,4 +1,4 @@
-# DEF CON 32 Doom 
+# DEFCON 32 Doom 
 
 This is a version of my "rp2040-doom" (which itself now supports RP2350) modified to run on the DEFCON 32 Badge
 
