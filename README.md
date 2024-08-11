@@ -1,4 +1,69 @@
-# RP2040 (+RP2350) Doom
+# DEF CON 32 Doom 
+
+This is a version of my "rp2040-doom" (which itself now supports RP2350) modified to run on the DEFCON 32 Badge
+
+Note that the badge speaker seems to distort really easily, so I have the sound turned way down for now, this is probably good
+anyway so you don't annoy people around you, but the volume control in the menus does work.
+
+If you want to read about getting the fully functional and complete Demo version of Doom running in 264K and 2MB of flash, you can do so
+in the blog post [here](https://kilograham.github.io/rp2040-doom/).
+
+The regular build instructions should work with the latest [pico-sdk](https://github.com/raspberrypi/pico-sdk) and other dependencies, but you should pass
+`-DPICO_BOARD=defcon32_badge` to CMake as well.
+
+### Things that I have tried and are kwown to work:
+
+- Demos
+- Playing a game
+- Completing levels
+- Save/Load game (note these are stored in flash, so will persist across badge power cycles)
+
+### Things that don't work:
+
+- "Quit Game" main menu item which is actually meant to quit to DOS (i removed the DOS mode because it uses 640x480 screen)
+   - Note the menu to end an active game is actually under "Options/End Game", and does work
+- There is no button for strafe
+- There is no way to enter cheats
+
+### Things that might work:
+
+- The end sequence
+- Multiplayer; rp2040-doom does support I2C networked games
+
+## Controller Input:
+
+### Normal button behavior
+Button|Behavior
+--|---
+Start | Show Menu / Go back
+Select | Select Menu
+Left / Right / Up / Down | Move
+A | Open Door
+B | Fire
+
+### Button behavior when pressing the FN (bottom right on the back)
+
+Button|Behavior
+--|---
+FN+Select | Show / Hide Map
+FN+Up | Y (for menus)
+FN+Down | N (for menus)
+FN+Left | Press Left in rapid succession with FN down to press 1 then 2 then 3 etc. to select weapons
+
+Note when FN is pressed, An FPS indicator is also shown
+
+### Button behavior when typing
+
+Button|Behavior
+--|---
+Up/Down | Cycle through letters/space
+Left | Backspace
+Right | Select letter
+
+Note that typing does not seem to work in any dialogs except save game.
+
+# Original rp2040-doom README...
+
 
 This is a port of Doom for RP2040 / RP2350 devices, derived from [Chocolate Doom](https://github.com/chocolate-doom/chocolate-doom).
 
