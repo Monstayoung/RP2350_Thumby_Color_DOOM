@@ -618,6 +618,10 @@ target_compile_definitions(render_newhope INTERFACE
 if (PICO_ON_DEVICE)
     target_compile_definitions(render_newhope INTERFACE
             PICO_SCANVIDEO_MAX_SCANLINE_BUFFER_WORDS=164
+            # Badge LCD has RGB565
+            PICO_SCANVIDEO_PIXEL_BSHIFT=0
+            PICO_SCANVIDEO_PIXEL_GSHIFT=6
+            PICO_SCANVIDEO_PIXEL_RSHIFT=11
     )
 else()
     # we cannot rewrite the buffers in host mode so we need them to be big enough for text mode

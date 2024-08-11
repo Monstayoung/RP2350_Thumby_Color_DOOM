@@ -7,7 +7,7 @@ target_sources(common_pico INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/i_timer.c
         ${CMAKE_CURRENT_LIST_DIR}/i_video.c
         ${CMAKE_CURRENT_LIST_DIR}/stubs.c
-
+        ${CMAKE_CURRENT_LIST_DIR}/lcd.c
         ${CMAKE_CURRENT_LIST_DIR}/i_picosound.c
 )
 if (PICO_ON_DEVICE)

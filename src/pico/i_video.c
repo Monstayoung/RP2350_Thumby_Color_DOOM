@@ -56,9 +56,10 @@
 #include "hardware/dma.h"
 #include "hardware/structs/xip_ctrl.h"
 #endif
+#include "lcd.h"
 
 #define YELLOW_SUBMARINE 0
-#define SUPPORT_TEXT 1
+//#define SUPPORT_TEXT 1
 #if SUPPORT_TEXT
 typedef struct __packed {
     const char * const name;
@@ -980,18 +981,55 @@ void __no_inline_not_in_flash_func(new_frame_stuff)() {
     }
 }
 
+// hack in some simple double buffers
+static scanvideo_scanline_buffer_t fake_scanline_buffer;
+static uint32_t sdata[2][324];
+uint8_t which; // which of the buffers we're using
+const uint8_t stretch=1; // lets stretch for now as it works
+uint8_t asl = 0; // actual scanline number on display when stretching
 void __scratch_x("scanlines") fill_scanlines() {
+    // we are called
+    // 1. at the start
+    // 2. whenever a scanline DMA ends
+    //
+    // so we immediately kick off another DMA with the other buffer
+    if (stretch) {
+        dispRenderLine(asl++, sdata[which] + 1, 320);
+        // duplicate ever 6th line by simply not updating any of the other
+        // state or redrawing the next time around
+        if ((asl % 6) == 0) return;
+    } else {
+        uint16_t lsl = scanvideo_scanline_number(fake_scanline_buffer.scanline_id);
+        dispRenderLine(lsl + 20, sdata[which] + 1, 320);
+    }
 #if SUPPORT_TEXT
-    struct scanvideo_scanline_buffer *buffer = scanvideo_begin_scanline_generation_linked(display_video_type == VIDEO_TYPE_TEXT ? 2 : 1, false);
+//    struct scanvideo_scanline_buffer *buffer = scanvideo_begin_scanline_generation_linked(display_video_type == VIDEO_TYPE_TEXT ? 2 : 1, false);
 #else
-    struct scanvideo_scanline_buffer *buffer = scanvideo_begin_scanline_generation(false);
+//    struct scanvideo_scanline_buffer *buffer = scanvideo_begin_scanline_generation(false);
 #endif
 #if USE_INTERP
     need_save = interp_in_use;
     interp_updated = 0;
 #endif
 
+    which^= 1;
+    fake_scanline_buffer.data = sdata[which];
+    fake_scanline_buffer.data_max = 324;
+    fake_scanline_buffer.link = 0;
+    static scanvideo_scanline_buffer_t *buffer = &fake_scanline_buffer;
+
     while (buffer) {
+        // use existing scanline encoding
+        uint16_t lfn = scanvideo_frame_number(buffer->scanline_id);
+        uint16_t lsl = scanvideo_scanline_number(buffer->scanline_id);
+        // but we just count the screen lines ourselves
+        lsl++;
+        if (lsl == 200) {
+            lsl = 0;
+            asl = 0;
+            lfn++;
+        }
+        buffer->scanline_id = (lfn << 16) | lsl;
         static int8_t last_frame_number = -1;
         int frame = scanvideo_frame_number(buffer->scanline_id);
         int scanline = scanvideo_scanline_number(buffer->scanline_id);
@@ -1034,33 +1072,37 @@ void __scratch_x("scanlines") fill_scanlines() {
                     }
                 }
             }
-            uint16_t *p = (uint16_t *) buffer->data;
-            p[0] = video_doom_offset_raw_run;
-            p[1] = p[2];
-            p[2] = SCREENWIDTH - 3;
-            buffer->data[SCREENWIDTH / 2 + 1] = video_doom_offset_raw_1p;
-            buffer->data[SCREENWIDTH / 2 + 2] = video_doom_offset_end_of_scanline_skip_ALIGN;
-            buffer->data_used = SCREENWIDTH / 2 + 3;
+//            uint16_t *p = (uint16_t *) buffer->data;
+//            p[0] = video_doom_offset_raw_run;
+//            p[1] = p[2];
+//            p[2] = SCREENWIDTH - 3;
+//            buffer->data[SCREENWIDTH / 2 + 1] = video_doom_offset_raw_1p;
+//            buffer->data[SCREENWIDTH / 2 + 2] = video_doom_offset_end_of_scanline_skip_ALIGN;
+//            buffer->data_used = SCREENWIDTH / 2 + 3;
             DEBUG_PINS_CLR(scanline_copy, 1);
         } else {
 #if SUPPORT_TEXT
             render_text_mode_scanline(buffer, scanline);
 #else
             memset(buffer->data + 1, 0, SCREENWIDTH * 2);
-            p[0] = video_doom_offset_raw_run;
-            p[1] = p[2];
-            p[2] = SCREENWIDTH - 3;
-            buffer->data[SCREENWIDTH / 2 + 1] = video_doom_offset_raw_1p;
-            buffer->data[SCREENWIDTH / 2 + 2] = video_doom_offset_end_of_scanline_skip_ALIGN;
-            buffer->data_used = SCREENWIDTH / 2 + 3;
+//            p[0] = video_doom_offset_raw_run;
+//            p[1] = p[2];
+//            p[2] = SCREENWIDTH - 3;
+//            buffer->data[SCREENWIDTH / 2 + 1] = video_doom_offset_raw_1p;
+//            buffer->data[SCREENWIDTH / 2 + 2] = video_doom_offset_end_of_scanline_skip_ALIGN;
+//            buffer->data_used = SCREENWIDTH / 2 + 3;
 #endif
         }
-        scanvideo_end_scanline_generation(buffer);
-#if SUPPORT_TEXT
-        buffer = scanvideo_begin_scanline_generation_linked(display_video_type == VIDEO_TYPE_TEXT ? 2 : 1, false);
-#else
-        buffer = scanvideo_begin_scanline_generation(false);
-#endif
+        // we just do one scanline per invocation - arguably we know
+        // that we can generate a scanline buffer fast enough, so there
+        // isn't much point in buffering more ahead.
+        break;
+//        scanvideo_end_scanline_generation(buffer);
+//#if SUPPORT_TEXT
+//        buffer = scanvideo_begin_scanline_generation_linked(display_video_type == VIDEO_TYPE_TEXT ? 2 : 1, false);
+//#else
+//        buffer = scanvideo_begin_scanline_generation(false);
+//#endif
     }
 #if USE_INTERP
     if (interp_updated && need_save) {
@@ -1093,18 +1135,28 @@ static void core1() {
                                        uint16_t *pixel_buffer, int32_t max_pixels, int32_t expected_width, bool overlay);
     scanvideo_set_simulate_scanvideo_pio_fn(VIDEO_DOOM_PROGRAM_NAME, simulate_video_pio_video_doom);
 #endif
-    scanvideo_setup(&VGA_MODE);
+    // setup LCD GPIOs only
+    gpiosConfig(true);
+    // note freq is ignored
+    dispInit(10);
+    // turn on backlight etc.
+    dispOn();
+
+//    scanvideo_setup(&VGA_MODE);
 //    sem_release(&init_sem);
 #if PICO_ON_DEVICE
-    irq_set_exclusive_handler(LOW_PRIO_IRQ, fill_scanlines);
-    irq_set_enabled(LOW_PRIO_IRQ, true);
-    scanvideo_set_scanline_release_fn(free_buffer_callback);
+//    irq_set_exclusive_handler(LOW_PRIO_IRQ, fill_scanlines);
+//    irq_set_enabled(LOW_PRIO_IRQ, true);
+//    scanvideo_set_scanline_release_fn(free_buffer_callback);
 #endif
-    scanvideo_timing_enable(true);
+//    scanvideo_timing_enable(true);
 #if PICO_ON_DEVICE
-    irq_set_pending(LOW_PRIO_IRQ);
+//    irq_set_pending(LOW_PRIO_IRQ);
 #endif
     sem_release(&core1_launch);
+    // we need to kick off the first scanline (poorly named function
+    // now as it only does one)
+    fill_scanlines();
     while (true) {
         pd_core1_loop();
 #if PICO_ON_DEVICE
