@@ -32,7 +32,7 @@
 
 #include "doomtype.h"
 #include "i_picosound.h"
-#include "pico/audio_i2s.h"
+#include "pico/audio_pwm8.h"
 #include "pico/binary_info.h"
 #include "hardware/gpio.h"
 
@@ -402,6 +402,12 @@ static void I_Pico_UpdateSound(void)
                 }
             }
         }
+        // let's collapse stereo to mono...
+        int16_t *samples = (int16_t *)buffer->buffer->bytes;
+        for(int i=0;i<buffer->sample_count * 2; i += 2) {
+            // ... and divide by 4 not 2 because the speaker is real bad
+            samples[i] = samples[i+1] = (samples[i] + samples[i+1])/4;
+        }
         give_audio_buffer(producer_pool, buffer);
     }
 }
@@ -423,29 +429,18 @@ static boolean I_Pico_InitSound(boolean _use_sfx_prefix)
     // todo this will likely need adjustment - maybe with IRQs/double buffer & pull from audio we can make it quite small
     producer_pool = audio_new_producer_pool(&producer_format, 2, 1024); // todo correct size
 
-    struct audio_i2s_config config = {
-            .data_pin = PICO_AUDIO_I2S_DATA_PIN,
-            .clock_pin_base = PICO_AUDIO_I2S_CLOCK_PIN_BASE,
-            .dma_channel = 6,
-            .pio_sm = 0,
+    audio_pwm8_config_t config = {
+            .num_channels = 1,
+            .pins = { PICO_AUDIO_PWM_L_PIN }
     };
 
-    const struct audio_format *output_format;
-    output_format = audio_i2s_setup(&audio_format, &config);
+    const struct audio_format *output_format = audio_pwm8_setup(&audio_format, &config);
     if (!output_format) {
         panic("PicoAudio: Unable to open audio device.\n");
     }
-
-#if INCREASE_I2S_DRIVE_STRENGTH
-    bi_decl(bi_program_feature("12mA I2S"));
-    gpio_set_drive_strength(PICO_AUDIO_I2S_DATA_PIN, GPIO_DRIVE_STRENGTH_12MA);
-    gpio_set_drive_strength(PICO_AUDIO_I2S_CLOCK_PIN_BASE, GPIO_DRIVE_STRENGTH_12MA);
-    gpio_set_drive_strength(PICO_AUDIO_I2S_CLOCK_PIN_BASE+1, GPIO_DRIVE_STRENGTH_12MA);
-#endif
-    // we want to pass thr
-    bool ok = audio_i2s_connect_extra(producer_pool, false, 0, 0, NULL);
+    bool ok = audio_pwm8_connect(producer_pool);
     assert(ok);
-    audio_i2s_set_enabled(true);
+    audio_pwm8_set_enabled(true);
 
     sound_initialized = true;
     return true;

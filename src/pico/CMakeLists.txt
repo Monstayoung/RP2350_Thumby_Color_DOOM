@@ -32,8 +32,7 @@ target_include_directories(common_pico INTERFACE
 
 target_compile_definitions(common_pico INTERFACE
         NO_USE_MOUSE=1
-        PICO_AUDIO_I2S_PIO=1
-        PICO_AUDIO_I2S_DMA_IRQ=1
+        PICO_AUDIO_PWM8_DMA_IRQ=1
         PICO_USE_SW_SPIN_LOCKS=0
         PICO_USE_STACK_GUARDS=0 # todo we can actually use these sensibly, but right now we do overflow!
 )
@@ -45,3 +44,5 @@ add_library(pico_cd INTERFACE)
 if (TARGET tinyusb_host)
     target_link_libraries(pico_cd INTERFACE tinyusb_host)
 endif()
+
+add_subdirectory(pico_audio_pwm8)
