@@ -65,16 +65,16 @@ const audio_format_t *audio_pwm8_setup(const audio_format_t *intended_audio_form
 
     dma_channel_config dma_config = dma_channel_get_default_config(dma_channel);
 
+    shared_state.slice_num = pwm_gpio_to_slice_num(config->pins[0]);
     channel_config_set_dreq(&dma_config,
-                            DREQ_DMA_TIMER0
+                            PWM_DREQ_NUM(shared_state.slice_num)
     );
 
     // todo only true for stereo
     channel_config_set_transfer_data_size(&dma_config, DMA_SIZE_32);
     // todo only true for same pin
-    shared_state.slice_num = pwm_gpio_to_slice_num(config->pins[0]);
     pwm_config pc = pwm_get_default_config();
-    pwm_config_set_wrap(&pc, 255);
+    pwm_config_set_wrap(&pc, 5431); // 270000000 / 49716 ish
     pwm_init(shared_state.slice_num, &pc, true);
     dma_channel_configure(dma_channel,
                           &dma_config,

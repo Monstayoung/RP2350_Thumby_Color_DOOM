@@ -32,6 +32,7 @@ audio_buffer_t *audio_pwm8_mono_to_stereo_consumer_take_s16(audio_connection_t *
 }
 
 audio_buffer_t *audio_pwm8_stereo_to_stereo_consumer_take_s16(audio_connection_t *connection, bool block) {
-    return consumer_pool_take<Stereo<FmtPWM8>, Stereo<FmtS16>>(connection, block);
+    // buffer conversion is done in i_picosound now, so just do a pass thru copy for now
+    return consumer_pool_take<Stereo<FmtS16>, Stereo<FmtS16>>(connection, block);
 }
 

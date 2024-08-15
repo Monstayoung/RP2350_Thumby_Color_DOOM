@@ -571,6 +571,7 @@ void I_GetEvent() {
 #endif
 #endif
 
+#ifdef DEFCON32_BADGE
 static const uint8_t bdef[] = {
         DEFCON32_BADGE_SW_FN_PIN, 0, 0,
         DEFCON32_BADGE_SW_START_PIN, SDL_SCANCODE_ESCAPE, SDL_SCANCODE_ESCAPE,
@@ -585,7 +586,10 @@ static const uint8_t bdef[] = {
 static uint8_t buttons[count_of(bdef)/3];
 static uint8_t keycodex[count_of(bdef)/3];
 #include "hardware/gpio.h"
+#endif
+
 void I_GetEventTimeout(int key_timeout) {
+#ifdef DEFCON32_BADGE
     static int mods;
     // this is a bit hacky, but just track the state
     // of each of the keys we care about, and select a different function
@@ -618,6 +622,7 @@ void I_GetEventTimeout(int key_timeout) {
     }
     extern boolean show_fps;
     show_fps = buttons[0];
+#endif
 #if PICO_ON_DEVICE && !NO_USE_UART
     if (uart_is_readable(uart_default)) {
         char c = uart_getc(uart_default);

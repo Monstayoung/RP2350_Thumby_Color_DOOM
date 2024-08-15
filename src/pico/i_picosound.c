@@ -405,8 +405,19 @@ static void I_Pico_UpdateSound(void)
         // let's collapse stereo to mono...
         int16_t *samples = (int16_t *)buffer->buffer->bytes;
         for(int i=0;i<buffer->sample_count * 2; i += 2) {
-            // ... and divide by 4 not 2 because the speaker is real bad
-            samples[i] = samples[i+1] = (samples[i] + samples[i+1])/4;
+            // hacky: we take 270Mhz / 5431 to be close to our sample rate of 49716 Hz which is a pain
+            // to change as that is the OPL2 freq
+            uint x = samples[i] + samples[i+1];
+#ifdef DEFCON32_BADGE
+            // note 2x because the volume is so quiet - thus the need to saturate
+            pico_default_asm(
+                    "ssat    %0,  #16, %0"
+                    : "+r" (x));
+            x = 2715 + x * 2715 / 32768;
+#else
+            x = 2715 + x * 2715 / 65536;
+#endif
+            samples[i] = samples[i+1] = x;
         }
         give_audio_buffer(producer_pool, buffer);
     }
