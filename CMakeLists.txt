@@ -97,3 +97,22 @@ configure_file(src/setup/setup-manifest.xml.in src/setup/setup-manifest.xml)
 foreach(SUBDIR textscreen midiproc opl pcsound src)
     add_subdirectory("${SUBDIR}")
 endforeach()
+
+# Simple display test
+if (PICO_ON_DEVICE)
+    add_executable(test_simple test_simple.c)
+
+    target_compile_definitions(test_simple PRIVATE
+        PICO_CORE1_STACK_SIZE=256
+    )
+
+    target_link_libraries(test_simple
+        pico_stdlib
+        hardware_spi
+        hardware_gpio
+    )
+
+    pico_add_extra_outputs(test_simple)
+    pico_enable_stdio_usb(test_simple 0)
+    pico_enable_stdio_uart(test_simple 0)
+endif()

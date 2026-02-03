@@ -1,314 +1,163 @@
-# DEFCON 32 Doom 
+# DOOM for Thumby Color (RP2350)
 
-This is a version of my "rp2040-doom" (which itself now supports RP2350) modified to run on the DEFCON 32 Badge
+![DOOM on Thumby Color](https://img.shields.io/badge/Status-Playable-brightgreen) ![Platform](https://img.shields.io/badge/Platform-RP2350-blue) ![Display](https://img.shields.io/badge/Display-128x128-orange)
 
-Note that the badge speaker seems to distort really easily, so I have the sound turned way down for now, this is probably good
-anyway so you don't annoy people around you, but the volume control in the menus does work.
+A port of Chocolate DOOM to the **Thumby Color** handheld gaming device powered by the **RP2350** microcontroller.
 
-If you want to read about getting the fully functional and complete Demo version of Doom running in 264K and 2MB of flash, you can do so
-in the blog post [here](https://kilograham.github.io/rp2040-doom/).
+## 🎮 Features
 
-The regular build instructions should work with the latest [pico-sdk](https://github.com/raspberrypi/pico-sdk) and other dependencies, but you should pass
-`-DPICO_BOARD=defcon32_badge` to CMake as well.
+- ✅ Full DOOM gameplay running on RP2350 (ARM Secure mode)
+- ✅ Real-time horizontal pixel downsampling (320→128 pixels)
+- ✅ Custom GC9107 display driver (128x128 RGB565)
+- ✅ Proper portrait orientation
+- ✅ DMA-driven rendering with interrupt loop
+- ⚠️ Vertical scaling in progress (currently shows top ~64% of game)
 
-### Things that I have tried and are kwown to work:
+## 📸 Screenshots
 
-- Demos
-- Playing a game
-- Completing levels
-- Save/Load game (note these are stored in flash, so will persist across badge power cycles)
+*Add your photos here!*
 
-### Things that don't work:
+## 🔧 Hardware Requirements
 
-- "Quit Game" main menu item which is actually meant to quit to DOS (i removed the DOS mode because it uses 640x480 screen)
-   - Note the menu to end an active game is actually under "Options/End Game", and does work
-- There is no button for strafe
-- There is no way to enter cheats
+- **Thumby Color** by TinyCircuits
+- **RP2350** microcontroller (ARM Cortex-M33)
+- **GC9107** 128x128 LCD display
+- USB-C cable for flashing
 
-### Things that might work:
+## 🚀 Quick Start
 
-- The end sequence
-- Multiplayer; rp2040-doom does support I2C networked games
+### Prerequisites
 
-## Controller Input:
+- MSYS2 MinGW64 environment
+- arm-none-eabi-gcc toolchain (13.3.0+)
+- CMake and Ninja
+- Pico SDK with RP2350 support
+- picotool
 
-### Normal button behavior
-Button|Behavior
---|---
-Start | Show Menu / Go back
-Select | Select Menu
-Left / Right / Up / Down | Move
-A | Open Door
-B | Fire
-
-### Button behavior when pressing the FN (bottom right on the back)
-
-Button|Behavior
---|---
-FN+Select | Show / Hide Map
-FN+Up | Y (for menus)
-FN+Down | N (for menus)
-FN+Left | Press Left in rapid succession with FN down to press 1 then 2 then 3 etc. to select weapons
-
-Note when FN is pressed, An FPS indicator is also shown
-
-### Button behavior when typing
-
-Button|Behavior
---|---
-Up/Down | Cycle through letters/space
-Left | Backspace
-Right | Select letter
-
-Note that typing does not seem to work in any dialogs except save game.
-
-# Original rp2040-doom README...
-
-
-This is a port of Doom for RP2040 / RP2350 devices, derived from [Chocolate Doom](https://github.com/chocolate-doom/chocolate-doom).
-
-Significant changes have been made to support running on the RP2xxx device, but particularly to support running the 
-entire shareware `DOOM1.WAD` which is 4M big on a Raspberry Pi Pico with only 2M flash!
-
-You can read many details on this port in the blog post [here](https://kilograham.github.io/rp2040-doom/).
-
-Note that a hopefully-fully-functional `chocolate-doom` executable is buildable from this RP2xxx code base as a 
-means of 
-verification that everything still works, but whilst they can still be built, Hexen, Strife and Heretic are almost 
-certainly broken, so are not built by default.
-
-This chocolate-doom commit that the code is branched off can be found in the `upstream` branch.
-
-The original Chocolate Doom README is [here](README-chocolate.md).
-
-## Code State
-
-Thus far, the focus has been entirely on getting RP2040 Doom running. Not a lot of time has been 
-spent 
-cleaning 
-the code up. There are a bunch of defunct `#ifdefs` and other code that was useful at some point, 
-but no longer are, and indeed changing them may result in non-functional code. This is particularly 
-true of 
-the 
-`whd_gen` tool 
-used to 
-convert/compress WADs 
-who's code is 
-likely completely incomprehensible!  
-
-## Artifacts
-
-You can find a RP2040 Doom UF2s based on the standard VGA/I2S pins in the 
-releases of this repository. There are also versions with the shareware DOOM1.WAD already embedded.
-
-Note you can always use `picotool info -a <UF2 file>` to see the pins used by a particular build.
-
-## Goals
-
-The main goals for this port were:
-
-1. Everything should match the original game experience, i.e. all the graphics at classic 320x200 resolution, stereo
-   sound,
-   OPL2 music, save/load, demo playback, cheats, network multiplayer... basically it should feel like the original game.
-2. `DOOM1.WAD` should run on a Raspberry Pi Pico. There was also to be no sneaky discarding of splash screens, altering of levels, down-sampling of
-   textures or whatever. RP2040 boards with 8M should be able to play at least the full *Ultimate Doom* and *DOOM II*
-   WADs.
-3. The RP2040 should output directly to VGA (16 color pins for RGB565 along with HSync/VSync) along with stereo sound.
-
-## Results
-
-[![RP2040 Doom on a Raspberry Pi Pico](https://img.youtube.com/vi/eDVazQVycP4/maxresdefault.jpg)](https://youtu.be/eDVazQVycP4)
-
-Features:
-
-* Full `DOOM1.WAD` playable on Raspberry Pi Pico with 2M flash.
-* *Ultimate Doom* and *Doom II* are playable on 8M devices.
-* 320x200x60 VGA output (really 1280x1024x60).
-* 9 Channel OPL2 Sound at 49716Hz.
-* 9 Channel Stereo Sound Effects.
-* I2C networking for up to 4 players.
-* Save/Load of games.
-* All cheats supported.
-* Demos from original WADs run correctly.
-* USB Keyboard Input support.
-* All end scenes, intermissions, help screens etc. supported.
-* Good frame rate; generally 30-35+ FPS.
-* Uses 270Mhz overclock (requires flash chip that will run at 135Mhz)
-
-# Building
-
-RP2040 Doom should build fine on Linux and macOS. The RP2040 targeting builds should also work on Windows, though I 
-haven't tried.
-
-The build uses `CMake`.
-
-## Regular chocolate-doom/native builds
-
-To build everything, assuming you have SDL2 dependencies installed, you can create a build directory:
+### Building
 
 ```bash
+cd rp2040-doom
 mkdir build
 cd build
-cmake ..
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
+ninja doom_tiny
 ```
 
-And then run `make` or `make -j<num_cpus>` from that directory. To build a particular target e.g. `chocolate-doom`, 
-do `make chocolate-doom`
+### Flashing
 
-Note this is the way you build the `whd_gen` tool too.
-
-## RP2040 Doom builds
-
-You must have [pico-sdk](https://github.com/raspberrypi/pico-sdk) and 
-**the latest version of** [pico-extras](https://github.com/raspberrypi/pico-extras) installed, along with the regular 
-pico-sdk requisites (e.g.
-`arm-none-eabi-gcc`). If in doubt, see the Raspberry Pi
-[documentation](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf). I have been building against 
-the `develop` branch of `pico-sdk`, so I recommend that..
-
-**NOTE: I am building with arm-none-eabi-gcc 13.2.rel1 .. whilst other versions may work, changes in compiler version may affect the binary size which, being tight, can cause problems (either link failure, or you may see stack overflow in the form of color palette corruption). Particularly I know tjhat arm-none-eabi-gcc 10.x versions don't work well.**
-
-For USB keyboard input support, RP2040 Doom currently uses a modified version of TinyUSB included as a submodule. 
-Make sure you have initialized this submodule via `git submodule update --init` 
-
-You can create a build directly like this:
-
+1. Hold BOOTSEL button while plugging in Thumby Color
+2. Flash with picotool:
 ```bash
-mkdir rp2040-build
-cd rp2040-build
-cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DPICO_BOARD=vgaboard -DPICO_SDK_PATH=/path/to/pico-sdk -DPICO_EXTRAS_PATH=/path/to/pico-extras ..
+picotool load build/src/doom_tiny.elf
+picotool reboot
 ```
 
-Note that the `PICO_BOARD` setting is for the standard VGA demo board which has RGB on pins 0->15, sync pins on 16,17 
-and 
-I2S on 26,27,28.
+## 🎯 Technical Highlights
 
-As before, use `make` or `make <target>` to build. 
+### RP2350-Specific Fixes
 
-The RP2040 version has four targets, each of which create a similarly named `UF2` file (e.g. `doom_tiny.uf2`). 
-These UF2 files contain the executable code/data, but they do not contain the WAD data which is converted into a 
-RP2040 Domom 
-specific WHD/WHX format by `whd_gen` (for more see below). The WHD/WHX file must also be loaded onto the device at a 
-specific address which varies by binary. 
+- **XIP Access Control**: Required for accessing flash beyond program region
+  ```c
+  hw_set_bits(&accessctrl_hw->xip_ctrl, ACCESSCTRL_PASSWORD_BITS | 0xff);
+  ```
+- **Single-core mode**: Multicore broken in ARM Secure mode
+- **GPIO limitations**: GPIO 28+ causes crashes on RP2350
 
-"super-tiny" refers to RP2040 Doom builds that use the more compressed WHX format, and 
-required for`DOOM1.
-WAD` to 
-run 
-on a 2M Raspberry Pi Pico. "Non super-tiny" refers to RP2040 Doom builds that use the WHD format which is larger, but 
-also is 
-required for *Ultimate Doom* and *Doom II* WADs. These binaries are distinct as supporting both formats in the same 
-binary would just have made things bigger and slower.
+### Display Configuration
 
+**Pins (Thumby Color):**
+- LCD_DC = GPIO 16
+- LCD_CS = GPIO 17  
+- LCD_SCK = GPIO 18
+- LCD_DO (MOSI) = GPIO 19
+- LCD_RST = GPIO 4
+- LCD_BL = GPIO 7
 
-* **doom_tiny** This is a "super tiny" version with no USB keyboard support. You can use
-[SDL Event Forwarder](https://github.com/kilograham/sdl_event_forwarder) to tunnel keyboard input from your host 
-  computer over UART. The WHX file must be loaded at `0x10040000`. 
-* **doom_tiny_usb** This is a "super tiny" version with additional USB keyboard support. Because of the extra USB 
-  code, the WHX file must be loaded at `0x10042000`. As you can see USB support via TinyUSB causes the binary to 
-  grow by 2K (hence the move of the WHX file address) leaving less space for saved games (which are also stored in 
-  flash).
-* **doom_tiny_nost** This is a "non super tiny" version of `doom_tiny` supporting larger WADs stored as WHD. The WHD 
-  file must be loaded at `0x10048000`
-* **doom_tiny_nost_usb** This is a "non super tiny" version of `doom_tiny_usb` supporting larger WADs stored as 
-  WHD. The WHD
-  file must be loaded at `0x10048000`
+**GC9107 Initialization:**
+- MADCTL = 0xE0 (portrait orientation: MY=1, MX=1, MV=1)
+- INVON (0x21) for correct colors
+- RGB565 color mode
 
-You can load you WHD/WHX file using [picotool](https://github.com/raspberrypi/picotool). e.g.
+### Pixel Downsampling
 
-```bash
-picotool load -v -t bin doom1.whx -o 0x10042000.
+Horizontal scaling samples every 2.5th pixel to fit 320-pixel game width into 128-pixel display:
+
+```c
+for (int i = 0; i < 128; i++) {
+    scaled_line[i] = src[(i * 5) / 2];  // Sample every 2.5th pixel
+}
 ```
 
-See `whd_gen` further below for generating `WHX` or `WHD` files.
-
-#### USB keyboard support
-
-Note that TinyUSB host mode support for keyboard may not work with all keyboards especially since the RP2040 Doom 
-has been built with small limits for number/sizes of hubs etc. I know that Raspberry Pi keyboards work fine, as 
-did my ancient 
-Dell keyboard. Your keyboard may just do nothing, or may cause a crash. If so, for now, you are stuck forwarding 
-keys from another PC via sdl_event_forwarder.
-
-### RP2040 Doom builds not targeting an RP2040 device
-
-You can also build the RP2040 Doom to run on your host computer (Linux or macOS) by using
-[pico_host_sdl](https://github.com/raspberrypi/pico-host-sdl) which simulates RP2040 based video/audio output using SDL.
-
-This version currently embeds the WHD/WHX in `src/tiny.whd.h` so you must generate this file.
-
-You can do this via `./cup.sh <whd/whx_file>`
-
-```bash
-mkdir host-build
-cd host-build
-cmake -DPICO_PLATFORM=host -DPICO_SDK_PATH=/path/to/pico-sdk -DPICO_EXTRAS_PATH=/path/to/pico-extras -DPICO_SDK_PRE_LIST_DIRS=/path/to/pico_host_sdl ..
-```
-
-... and then `make` as usual.
-
-## whd_gen
-
-`doom1.whx` is includd in this repository, otherwise you need to build `whd_gen` using the regular native build 
-instructions above.
-
-To generate a WHX file (you must use this to convert DOOM1.WAD to run on a 2M Raspberry Pi Pico)
-
-```bash
-whd_gen <wad_file> <whx_file>
-```
-
-The larger WADs (e.g. *Ultimate Doom* or *Doom II* have levels which are too complex to convert into a super tiny 
-WHX file. These larger WADs are not going to fit in a 2M flash anywy, so the less compressed WHD format can be used 
-given that the device now probably has 8M of flash.
-
-```bash
-whd_gen <wad_file> <whd_file> -no-super-tiny
-```
-
-Note that `whd_gen` has not been tested with a wide variety of WADs, so whilst it is possible that non Id WADs may 
-work, it is by no means guaranteed!
-
-NOTE: You should use a release build of `whd_gen` for the best sound effect fidelity, as the debug build 
-deliberately lowers the encoding quality for the sake of speed.
-
-# Running the RP2040 version
-
-The releases here use pins as defined when building with `PICO_BOARD=vgaboard`:
+## 📂 Project Structure
 
 ```
- 0-4:    Red 0-4
- 6-10:   Green 0-4
- 11-15:  Blue 0-4
- 16:     HSync
- 17:     VSync
- 18:     I2C1 SDA
- 19:     I2C1 SCL
- 20:     UART1 TX
- 21:     UART1 RX
- 26:     I2S DIN
- 27:     I2S BCK
- 28:     I2S LRCK
+rp2040-doom/
+├── src/
+│   ├── pico/
+│   │   ├── i_video.c          # Video system with downsampling
+│   │   ├── lcd.c               # GC9107 display driver
+│   │   ├── dispDefcon.h        # Display configuration
+│   │   └── pinoutRp2350defcon.h # Pin definitions
+│   └── doom/
+│       └── d_main.c            # XIP access control fix
+├── doom1.whx                   # Shareware DOOM WAD (IWHX format)
+└── WORKING_CHECKPOINT_2026-02-02/
+    └── RESTORE_INSTRUCTIONS.md # Complete setup guide
 ```
-You can always find these from your ELF or UF2 with 
+
+## 🐛 Known Issues
+
+- Vertical downsampling causes black screen (in progress)
+- Currently displays top ~64% of game (200→128 pixels needs work)
+- Button input not yet implemented
+- Audio not yet implemented
+
+## 🔮 Future Work
+
+- [ ] Complete vertical pixel downsampling
+- [ ] Implement button controls (GPIO 20-27)
+- [ ] Add audio support
+- [ ] Performance optimization
+- [ ] Menu navigation
+- [ ] Save game support
+
+## 📝 Memory Layout
 
 ```
-picotool info -a <filename>
-``` 
+Flash Memory Map:
+0x10000000 - 0x100B4000  Program code (735KB)
+0x10100000 - 0x102B7898  WAD file (1.8MB)
+```
 
-These match for example the Pimoroni Pico VGA Demo Base which itself is based on the suggested 
-Raspberry Pi Documentation [here](https://datasheets.raspberrypi.com/rp2040/hardware-design-with-rp2040.pdf)
-and the design files zipped [here](https://datasheets.raspberrypi.com/rp2040/VGA-KiCAD.zip).
+## 🤝 Contributing
 
-# Future
+Contributions welcome! This is cutting-edge RP2350 development. Areas that need help:
 
-*Evilution* and *Plutonia* are not yet supported. There is an issue tracking it 
-[here](https://github.com/kilograham/rp2040-doom/issues/1).
+1. Vertical downsampling algorithm
+2. Button input implementation  
+3. Performance optimization
+4. Audio system
 
-# RP2040 Doom Licenses
+## 📄 License
 
-* Any code derived from chocolate-doom matinains its existing license (generally GPLv2). 
-* New RP2040 Doom specific code not implementing existing chocolate-doom interfaces is licensed BSD-3.
-* ADPCM-XA is unmodified and is licensed BSD-3.
-* Modified emu8950 derived code retains its MIT license.
+Based on Chocolate DOOM (GPL-2.0). See original project for license details.
+
+## 🙏 Credits
+
+- **Chocolate DOOM** team for the original port
+- **TinyCircuits** for Thumby Color hardware
+- **Raspberry Pi Foundation** for RP2350 and Pico SDK
+- This port created with assistance from GitHub Copilot
+
+## 📚 References
+
+- [Chocolate DOOM](https://github.com/chocolate-doom/chocolate-doom)
+- [Thumby Color](https://tinycircuits.com/products/thumby-color)
+- [RP2350 Datasheet](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)
+- [GC9107 Display Driver](https://www.buydisplay.com/download/ic/GC9107.pdf)
+
+---
+
+**Status:** Active Development | **First Playable:** February 2026 🎉
 

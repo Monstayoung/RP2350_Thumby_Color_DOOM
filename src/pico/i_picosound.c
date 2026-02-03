@@ -36,6 +36,12 @@
 #include "pico/binary_info.h"
 #include "hardware/gpio.h"
 
+// Thumby Color doesn't have audio hardware due to size limitations
+// Using dummy pin definition to allow compilation
+#ifndef PICO_AUDIO_PWM_L_PIN
+#define PICO_AUDIO_PWM_L_PIN 255  // Dummy pin - audio disabled
+#endif
+
 #define ADPCM_BLOCK_SIZE 128
 #define ADPCM_SAMPLES_PER_BLOCK_SIZE 249
 #define LOW_PASS_FILTER

@@ -62,6 +62,17 @@ wad_file_t *W_OpenFile(const char *path)
     wad_file_t *result;
     int i;
 
+#if PICO_BUILD
+    // Handle empty path for DOOM_TINY mode
+    if (path == NULL || path[0] == '\0')
+    {
+        // For DOOM_TINY, return memory WAD file
+        extern wad_file_class_t memory_wad_file;
+        result = memory_wad_file.OpenFile(path);
+        return result;
+    }
+#endif
+
     //!
     // @category obscure
     //
@@ -70,8 +81,13 @@ wad_file_t *W_OpenFile(const char *path)
     //
 
 #if !USE_MEMMAP_ONLY
+#if PICO_BUILD
+    // Skip M_CheckParm on Pico - always use stdc file access
+    {
+#else
     if (!M_CheckParm("-mmap"))
     {
+#endif
         return stdc_wad_file.OpenFile(path);
     }
 #endif

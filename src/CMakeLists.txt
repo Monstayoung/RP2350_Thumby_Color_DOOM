@@ -566,7 +566,7 @@ function(add_doom_tiny SUFFIX RENDER_LIB)
         PICO_DEBUG_MALLOC=1
         EMU8950_NO_RATECONV=1
 
-        PICO_CORE1_STACK_SIZE=0x4f8
+        PICO_CORE1_STACK_SIZE=256
 
         NO_IERROR=1
     )
@@ -640,7 +640,7 @@ if (PICO_SDK)
             NO_USE_FINALE_BUNNY=1
     )
     target_compile_definitions(doom_tiny PRIVATE
-            TINY_WAD_ADDR=0x10040000
+            TINY_WAD_ADDR=0x10100000
     )
     target_link_libraries(doom_tiny PRIVATE tiny_settings)
     add_doom_tiny(_nost render_newhope)
@@ -652,17 +652,23 @@ if (PICO_SDK)
     if (PICO_ON_DEVICE)
         suppress_tinyusb_warnings()
         add_doom_tiny(_usb render_newhope)
-        target_link_libraries(doom_tiny_usb PRIVATE tiny_settings pico_cd)
+        target_link_libraries(doom_tiny_usb PRIVATE tiny_settings)
         target_compile_definitions(doom_tiny_usb PRIVATE
-                USB_SUPPORT=1
+                USB_SUPPORT=0
                 TINY_WAD_ADDR=0x10042000 # ugh tinyusb is >8K currently!!
         )
+        # Enable USB CDC for debug output (device mode, not host)
+        pico_enable_stdio_usb(doom_tiny_usb 1)
+        pico_enable_stdio_uart(doom_tiny_usb 0)
+        
         add_doom_tiny(_nost_usb render_newhope)
-        target_link_libraries(doom_tiny_nost_usb PRIVATE pico_cd)
+        target_link_libraries(doom_tiny_nost_usb PRIVATE)
         target_compile_definitions(doom_tiny_nost_usb PRIVATE
-                USB_SUPPORT=1
+                USB_SUPPORT=0
                 TINY_WAD_ADDR=0x10048000
                 )
+        pico_enable_stdio_usb(doom_tiny_nost_usb 1)
+        pico_enable_stdio_uart(doom_tiny_nost_usb 0)
     endif()
 endif()
 

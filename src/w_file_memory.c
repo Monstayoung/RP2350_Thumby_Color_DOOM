@@ -29,6 +29,7 @@
 #if PICO_BUILD
 #include "pico.h"
 #include "pico/binary_info.h"
+#include "hardware/gpio.h"
 #else
 #define panic I_Error
 #endif

@@ -1353,6 +1353,9 @@ void I_InitGraphics(void)
     SDL_Event dummy;
     should_be_const byte *doompal;
     char *env;
+    
+    // DEBUG: Entry to I_InitGraphics
+    gpio_put(7, 1); sleep_ms(100); gpio_put(7, 0); sleep_ms(50);
 
     // Pass through the XSCREENSAVER_WINDOW environment variable to 
     // SDL_WINDOWID, to embed the SDL window into the Xscreensaver
@@ -1372,11 +1375,17 @@ void I_InitGraphics(void)
     }
 
     SetSDLVideoDriver();
+    
+    // DEBUG: After SetSDLVideoDriver
+    gpio_put(7, 1); sleep_ms(100); gpio_put(7, 0); sleep_ms(50);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) 
     {
         I_Error("Failed to initialize video: %s", SDL_GetError());
     }
+    
+    // DEBUG: After SDL_Init
+    gpio_put(7, 1); sleep_ms(100); gpio_put(7, 0); sleep_ms(50);
 
     // When in screensaver mode, run full screen and auto detect
     // screen dimensions (don't change video mode)
@@ -1397,16 +1406,25 @@ void I_InitGraphics(void)
     // Create the game window; this may switch graphic modes depending
     // on configuration.
     AdjustWindowSize();
+    // DEBUG: After AdjustWindowSize
+    gpio_put(7, 1); sleep_ms(100); gpio_put(7, 0); sleep_ms(50);
+    
     SetVideoMode();
+    // DEBUG: After SetVideoMode
+    gpio_put(7, 1); sleep_ms(100); gpio_put(7, 0); sleep_ms(50);
 
     // Start with a clear black screen
     // (screen will be flipped after we set the palette)
 
     SDL_FillRect(screenbuffer, NULL, 0);
+    // DEBUG: After SDL_FillRect
+    gpio_put(7, 1); sleep_ms(100); gpio_put(7, 0); sleep_ms(50);
 
     // Set the palette
 
     doompal = W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE);
+    // DEBUG: After W_CacheLumpName PLAYPAL - palette loaded!
+    gpio_put(7, 1); sleep_ms(100); gpio_put(7, 0); sleep_ms(50);
 #if PRINT_PALETTE
     int size = W_LumpLength(W_GetNumForName(DEH_String("PLAYPAL")));
     assert(!(size % 768));
