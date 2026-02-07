@@ -1,0 +1,35 @@
+cmake_minimum_required(VERSION 3.13)
+
+include(pico_sdk_import.cmake)
+
+project(test_usb_minimal C CXX ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+
+pico_sdk_init()
+
+add_executable(test_usb_minimal
+    test_usb_minimal.c
+)
+
+# TinyUSB Device CDC configuration
+target_compile_definitions(test_usb_minimal PRIVATE
+    CFG_TUD_CDC=1
+    CFG_TUD_ENABLED=1
+    CFG_TUD_CDC_RX_BUFSIZE=256
+    CFG_TUD_CDC_TX_BUFSIZE=256
+    CFG_TUH_ENABLED=0
+)
+
+target_link_libraries(test_usb_minimal
+    pico_stdlib
+    hardware_gpio
+    pico_time
+    hardware_timer
+)
+
+# Enable USB serial
+pico_enable_stdio_usb(test_usb_minimal 1)
+pico_enable_stdio_uart(test_usb_minimal 0)
+
+pico_add_extra_outputs(test_usb_minimal)

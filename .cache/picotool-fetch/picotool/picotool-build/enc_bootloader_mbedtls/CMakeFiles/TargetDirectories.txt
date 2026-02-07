@@ -1,0 +1,2 @@
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-build/enc_bootloader_mbedtls/CMakeFiles/edit_cache.dir
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-build/enc_bootloader_mbedtls/CMakeFiles/rebuild_cache.dir

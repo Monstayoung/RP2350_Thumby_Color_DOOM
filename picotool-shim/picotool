@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+REAL="/c/msys64/home/Q/bin/picotool"
+
+# Pico SDK's CMake often probes with --version
+if [[ "$1" == "--version" || "$1" == "-V" ]]; then
+  exec "$REAL" version
+fi
+
+exec "$REAL" "$@"

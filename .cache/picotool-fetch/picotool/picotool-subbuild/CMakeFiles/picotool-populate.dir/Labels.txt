@@ -1,0 +1,14 @@
+# Target labels
+ picotool-populate
+# Source files and their labels
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/CMakeFiles/picotool-populate
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/CMakeFiles/picotool-populate.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/CMakeFiles/picotool-populate-complete.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/picotool-populate-prefix/src/picotool-populate-stamp/picotool-populate-build.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/picotool-populate-prefix/src/picotool-populate-stamp/picotool-populate-configure.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/picotool-populate-prefix/src/picotool-populate-stamp/picotool-populate-download.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/picotool-populate-prefix/src/picotool-populate-stamp/picotool-populate-install.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/picotool-populate-prefix/src/picotool-populate-stamp/picotool-populate-mkdir.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/picotool-populate-prefix/src/picotool-populate-stamp/picotool-populate-patch.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/picotool-populate-prefix/src/picotool-populate-stamp/picotool-populate-test.rule
+C:/msys64/home/Q/.cache/picotool-fetch/picotool/picotool-subbuild/picotool-populate-prefix/src/picotool-populate-stamp/picotool-populate-update.rule
