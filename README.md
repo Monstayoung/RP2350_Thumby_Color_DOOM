@@ -7,6 +7,9 @@ A fully working port of Chocolate DOOM to the **Thumby Color** handheld gaming d
 ## 🎮 Features
 
 - ✅ Full DOOM gameplay running on RP2350 (ARM Secure mode)
+- ✅ 270MHz overclock for improved performance
+- ✅ Enhanced controls (+35% faster turning, +20% faster movement)
+- ✅ Working audio with PWM output
 - ✅ Complete vertical coverage (200→128 scanlines with smart downsampling)
 - ✅ Real-time horizontal pixel downsampling (320→128 pixels)
 - ✅ Custom GC9107 display driver (128x128 RGB565)
@@ -46,34 +49,65 @@ A fully working port of Chocolate DOOM to the **Thumby Color** handheld gaming d
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### For Users (Easy!)
 
-- MSYS2 MinGW64 environment
+**Just drag and drop!**
+
+1. Download `doom_tiny.uf2` from the [Releases](../../releases) page
+2. Hold the **BOOTSEL button** on your Thumby Color while plugging it in via USB
+3. Your Thumby Color will appear as a USB drive
+4. Drag and drop `doom_tiny.uf2` onto the drive
+5. The Thumby will automatically reboot and start DOOM!
+
+### For Developers (Building from Source)
+
+#### Prerequisites
+
+- Windows with MSYS2 MinGW64 environment
 - arm-none-eabi-gcc toolchain (13.3.0+)
 - CMake and Ninja
 - Pico SDK with RP2350 support
-- picotool
 
-### Building
+#### Building
 
 ```bash
 cd defcon/rp2040-doom
 mkdir build
 cd build
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
-ninja doom_tiny
+cmake -G Ninja -DCMAKE_BUILD_TYPE=MinSizeRel ..
+ninja
 ```
 
-### Flashing
+#### Creating UF2 (Windows)
 
-1. Hold BOOTSEL button while plugging in Thumby Color
-2. Flash with picotool:
-```bash
-picotool load build/src/doom_tiny.elf -x
-picotool reboot
+Use the provided PowerShell script for easy building and flashing:
+
+```powershell
+.\build_and_flash.ps1
+```
+
+Or manually:
+```powershell
+# Build
+cd build
+ninja
+
+# Convert ELF to UF2
+C:\msys64\home\Q\bin\picotool.exe uf2 convert src\doom_tiny.elf src\doom_tiny.uf2 --family rp2350-arm-s
+
+# Flash (with Thumby in BOOTSEL mode on D:)
+Copy-Item src\doom_tiny.uf2 D:\doom_tiny.uf2
 ```
 
 ## 🎯 Technical Highlights
+
+### Performance Optimizations
+
+- **270MHz Overclock**: CPU running at 270MHz (11% faster than default 243MHz) for improved frame rate
+- **Enhanced Controls**: 
+  - Turn speed increased by 35% for more responsive aiming
+  - Movement speed increased by 20% for better gameplay feel
+- **Stable Voltage**: VREG set to 1.30V for reliable overclocking
 
 ### RP2350-Specific Fixes
 
