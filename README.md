@@ -10,6 +10,7 @@ A fully working port of Chocolate DOOM to the **Thumby Color** handheld gaming d
 - ✅ 270MHz overclock for improved performance
 - ✅ Enhanced controls (+35% faster turning, +20% faster movement)
 - ✅ Working audio with PWM output
+- ✅ Save state support (save and resume your progress!)
 - ✅ Complete vertical coverage (200→128 scanlines with smart downsampling)
 - ✅ Real-time horizontal pixel downsampling (320→128 pixels)
 - ✅ Custom GC9107 display driver (128x128 RGB565)
@@ -51,13 +52,15 @@ A fully working port of Chocolate DOOM to the **Thumby Color** handheld gaming d
 
 ### For Users (Easy!)
 
-**Just drag and drop!**
+**Just drag and drop - no tools needed!**
 
-1. Download `doom_tiny.uf2` from the [Releases](../../releases) page
+1. Download `doom_thumby_color.uf2` from the [release folder](./release/)
 2. Hold the **BOOTSEL button** on your Thumby Color while plugging it in via USB
-3. Your Thumby Color will appear as a USB drive
-4. Drag and drop `doom_tiny.uf2` onto the drive
-5. The Thumby will automatically reboot and start DOOM!
+3. Your Thumby Color will appear as a USB drive (usually D: on Windows)
+4. Drag and drop `doom_thumby_color.uf2` onto the drive
+5. The Thumby will automatically flash and reboot into DOOM!
+
+**That's it! Start playing!**
 
 ### For Developers (Building from Source)
 
