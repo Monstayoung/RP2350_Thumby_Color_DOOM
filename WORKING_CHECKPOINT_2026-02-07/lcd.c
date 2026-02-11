@@ -196,7 +196,7 @@ void __not_in_flash_func(dispRenderLine)(uint y, uint16_t *buf, uint32_t width) 
     while (dma_channel_is_busy(DISP_DMA_XFER_CH));
     busy_wait_at_least_cycles(3200);
     dispPrvSetPioWidth(8);
-    lcdSetRegion(0, y, 128, 1, 0, 0);
+    lcdSetRegion(y, 0, 1, width, 0, 0);
     lcdCmd(0x2c, false, -1); //write data command
     dispPrvSetPioWidth(16);
     dma_channel_transfer_from_buffer_now(DISP_DMA_XFER_CH, buf, 128);
@@ -350,8 +350,8 @@ divClk = 2;
     // Color mode - 16-bit RGB565
     lcdCmd(0x3A, true, 0x55, -1);  // COLMOD
     
-    // Memory Access Control - Correct orientation with BGR color order
-    lcdCmd(0x36, true, 0xC8, -1);  // MADCTL: MY=1, MX=1, MV=0, BGR=1
+    // Memory Access Control - Rotate 90° for portrait with BGR color order
+    lcdCmd(0x36, true, 0xE8, -1);  // MADCTL: MY=1, MX=1, MV=1, BGR=1
     
     // Display Inversion ON - CRITICAL for correct colors!
     lcdCmd(0x21, true, -1);  // INVON

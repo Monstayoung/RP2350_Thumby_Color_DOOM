@@ -1002,11 +1002,7 @@ void __scratch_x("scanlines") fill_scanlines() {
             // Sample every 2.5th pixel: i * 320 / 128 = i * 2.5
             scaled_line[i] = src[(i * 5) / 2];
         }
-        // Map 200 game scanlines to 128 display rows: asl * 128 / 200
-        // This means some display rows get written multiple times
-        uint8_t display_row = (asl * 128) / 200;
-        dispRenderLine(display_row, scaled_line, 128);
-        asl++;
+        dispRenderLine(asl++, scaled_line, 128);
     } else {
         uint16_t lsl = scanvideo_scanline_number(fake_scanline_buffer.scanline_id);
         dispRenderLine(lsl + 20, sdata[which] + 1, 128);

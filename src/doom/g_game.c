@@ -182,13 +182,13 @@ byte		consistancy[MAXPLAYERS][BACKUPTICS];
 
 #if !NO_USE_ARGS
 // there is --turbo option that hackily changes these
-fixed_t         forwardmove[2] = {0x19, 0x32};
-fixed_t         sidemove[2] = {0x18, 0x28};
-fixed_t         angleturn[3] = {640, 1280, 320};    // + slow turn
+fixed_t         forwardmove[2] = {0x1E, 0x3C};
+fixed_t         sidemove[2] = {0x1D, 0x30};
+fixed_t         angleturn[3] = {864, 1728, 432};    // + slow turn - TURN +35%, MOVE +20%
 #else
-static const int16_t         forwardmove[2] = {0x19, 0x32};
-static const int16_t         sidemove[2] = {0x18, 0x28};
-static const int16_t         angleturn[3] = {640, 1280, 320};    // + slow turn
+static const int16_t         forwardmove[2] = {0x1E, 0x3C};
+static const int16_t         sidemove[2] = {0x1D, 0x30};
+static const int16_t         angleturn[3] = {864, 1728, 432};    // + slow turn - TURN +35%, MOVE +20%
 #endif
 
 static const key_type_t * const weapon_keys[] = {

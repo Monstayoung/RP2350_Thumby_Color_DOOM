@@ -36,17 +36,16 @@
 #include "pico/binary_info.h"
 #include "hardware/gpio.h"
 
-// Audio disabled - no hardware support
-#define AUDIO_PWM_PIN 255       // Disabled
-#define AUDIO_ENABLE_PIN 255    // Disabled
+// Thumby Color doesn't have audio hardware due to size limitations
+// Using dummy pin definition to allow compilation
 #ifndef PICO_AUDIO_PWM_L_PIN
-#define PICO_AUDIO_PWM_L_PIN AUDIO_PWM_PIN
+#define PICO_AUDIO_PWM_L_PIN 255  // Dummy pin - audio disabled
 #endif
 
 #define ADPCM_BLOCK_SIZE 128
 #define ADPCM_SAMPLES_PER_BLOCK_SIZE 249
 #define LOW_PASS_FILTER
-#define MIX_MAX_VOLUME 12
+#define MIX_MAX_VOLUME 128
 typedef struct channel_s channel_t;
 
 static volatile enum {
