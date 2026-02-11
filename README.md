@@ -4,7 +4,7 @@
 
 A fully optimized port of DOOM running on the **Thumby Color** handheld gaming device.
 
-## 🎮 Features
+##  Features
 
 - ✅ Full DOOM gameplay with audio
 - ✅ 270MHz overclock for smooth performance
@@ -12,7 +12,7 @@ A fully optimized port of DOOM running on the **Thumby Color** handheld gaming d
 - ✅ Save state support
 - ✅ 128x128 color display with optimized rendering
 
-## 🚀 Installation
+##  Installation
 
 **Super Easy - Just Drag and Drop!**
 
@@ -35,9 +35,7 @@ A fully optimized port of DOOM running on the **Thumby Color** handheld gaming d
 | **Right Bumper** | Strafe |
 | **Menu Button** | Access menu |
 
-## 📸 Screenshots
 
-*Add your gameplay photos here!*
 
 ---
 
