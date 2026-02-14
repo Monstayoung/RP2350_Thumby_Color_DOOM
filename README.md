@@ -14,12 +14,18 @@ A fully optimized port of DOOM running on the **Thumby Color** handheld gaming d
 
 ##  Installation
 
-**Super Easy - Just Drag and Drop!**
+1. Download **both files** from the [release folder](./release/):
+   - `doom_thumby_color.uf2` (the program)
+   - `doom1.whx` (the game data)
+2. Install **picotool** if you don't have it
+3. Follow the step-by-step instructions in [release/INSTALL.md](./release/INSTALL.md)
 
-1. Download **`doom_thumby_color.uf2`** from the [release folder](./release/)
-2. Hold the **BOOTSEL button** while plugging your Thumby Color into USB
-3. Thumby appears as a USB drive - drag the UF2 file onto it
-4. Thumby automatically reboots into DOOM!
+**Quick version:**
+```bash
+picotool load doom_thumby_color.uf2
+picotool load -t bin doom1.whx -o 0x10100000
+picotool reboot
+```
 
 ## 🎯 Controls
 
