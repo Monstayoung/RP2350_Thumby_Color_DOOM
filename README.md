@@ -27,6 +27,18 @@ DOOM port for Thumby Color (RP2350) running at 270MHz with rumble motor support 
 
 **IMPORTANT: Flash in this exact order!**
 
+First, make sure your terminal is in the repo root (the folder that contains `binaries/`).
+
+**PowerShell (Windows):**
+```powershell
+Set-Location "C:\path\to\RP2350_Thumby_Color_DOOM"
+```
+
+**Bash (macOS/Linux/MSYS2):**
+```bash
+cd /path/to/RP2350_Thumby_Color_DOOM
+```
+
 #### Step 1: Flash the game data (WHX file)
 ```powershell
 picotool load -v binaries/doom1.whx -t bin -o 0x10100000
@@ -39,7 +51,16 @@ picotool load -v binaries/thumbycolor-doom-rumble-sfx.uf2
 picotool reboot
 ```
 
+**Alternative (no `cd`): use full paths**
+```powershell
+picotool load -v "C:\path\to\RP2350_Thumby_Color_DOOM\binaries\doom1.whx" -t bin -o 0x10100000
+picotool load -v "C:\path\to\RP2350_Thumby_Color_DOOM\binaries\thumbycolor-doom-rumble-sfx.uf2"
+picotool reboot
+```
+
 ### Quick Flash Script (Windows PowerShell)
+
+Run this from the repo root so the `binaries/` paths resolve, or edit the paths inside the script.
 
 ```powershell
 # flash.ps1
