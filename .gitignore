@@ -1,0 +1,45 @@
+# .gitignore for Thumby Color DOOM
+
+# Build artifacts
+build/
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Backups
+*.bak
+*_backup.*
+BACKUP_*
+
+# Temp files
+tmp/
+temp/
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Texture experiments (not needed in repo)
+textures_*/
+test_textures/
+DOOM_Texture_Work/
+*.pk3
+texture_comparison.png
