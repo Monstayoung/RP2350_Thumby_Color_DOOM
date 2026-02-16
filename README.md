@@ -22,6 +22,16 @@ DOOM port for Thumby Color (RP2350) running at 270MHz with rumble motor support 
 
 1. Install [picotool](https://github.com/raspberrypi/picotool)
 2. Put Thumby Color in BOOTSEL mode (hold BOOT button while connecting USB)
+3. Make sure `picotool` is on your PATH (Windows):
+
+```powershell
+# Example: run picotool by full path
+C:\path\to\picotool.exe --help
+
+# Or add the folder to PATH for this session
+$env:Path = "C:\path\to;" + $env:Path
+picotool --help
+```
 
 ### Flashing Steps
 
@@ -82,6 +92,17 @@ picotool reboot
 
 Write-Host "`n✓ Flash complete! DOOM should start automatically." -ForegroundColor Green
 ```
+
+## Troubleshooting
+
+**`picotool` not found**
+- Run it by full path (see prerequisites above), or add its folder to PATH.
+
+**No rumble / no audio**
+- Confirm you flashed `binaries/thumbycolor-doom-rumble-sfx.uf2` (not a different UF2). This repo binary is the known-good rumble/audio build.
+- Rumble requires a motor connected to GPIO 5.
+- Audio requires GPIO 23 (PWM) and GPIO 20 (speaker enable) wired correctly.
+- If your hardware does not have rumble/audio, those features will not work.
 
 ## Controls
 
