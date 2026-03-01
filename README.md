@@ -16,93 +16,114 @@ DOOM port for Thumby Color (RP2350) running at 270MHz with rumble motor support 
 - Rumble motor on GPIO 5
 - Audio: GPIO 23 (PWM), GPIO 20 (speaker enable)
 
-## Installation
+## Quick Start (3 Steps)
+
+**The easiest way to get DOOM running:**
+
+1. **Download/Clone this repository**
+   - Click the green "Code" button → Download ZIP
+   - Extract it anywhere on your computer
+
+2. **Install picotool** (one-time setup)
+   - Download from: https://github.com/raspberrypi/picotool/releases
+   - Add `picotool.exe` to your PATH, OR just remember where you saved it
+
+3. **Flash your Thumby Color**
+   - Hold the **BOOT button** while plugging in USB (BOOTSEL mode)
+   - Open PowerShell in the extracted folder
+   - Run: `.\flash.ps1`
+   - Done! DOOM starts automatically
+
+**That's it!** The script handles everything automatically.
+
+---
+
+## Detailed Installation Guide
 
 ### Prerequisites
 
-1. Install [picotool](https://github.com/raspberrypi/picotool)
-2. Put Thumby Color in BOOTSEL mode (hold BOOT button while connecting USB)
-3. Make sure `picotool` is on your PATH (Windows):
+- [picotool](https://github.com/raspberrypi/picotool) - Download from releases page
+- Thumby Color in BOOTSEL mode (hold BOOT button while connecting USB)
 
+**Optional:** Add picotool to your PATH so you can run it from anywhere. Otherwise, just remember where you downloaded it.
+
+### Method 1: Automated Script (Recommended)
+
+**Windows PowerShell:**
 ```powershell
-# Example: run picotool by full path
-C:\path\to\picotool.exe --help
+# Navigate to the downloaded repo folder
+cd path\to\RP2350_Thumby_Color_DOOM
 
-# Or add the folder to PATH for this session
-$env:Path = "C:\path\to;" + $env:Path
-picotool --help
+# Run the flash script
+.\flash.ps1
 ```
 
-### Flashing Steps
+The script automatically:
+- ✅ Finds the correct files
+- ✅ Flashes in the correct order
+- ✅ Checks for errors
+- ✅ Reboots your device
+
+### Method 2: Manual Commands (Advanced)
+
+If you prefer to flash manually or the script doesn't work:
 
 **IMPORTANT: Flash in this exact order!**
 
-First, make sure your terminal is in the repo root (the folder that contains `binaries/`).
-
-**PowerShell (Windows):**
+**Step 1:** Navigate to the repo folder
 ```powershell
-Set-Location "C:\path\to\RP2350_Thumby_Color_DOOM"
+cd path\to\RP2350_Thumby_Color_DOOM
 ```
 
-**Bash (macOS/Linux/MSYS2):**
-```bash
-cd /path/to/RP2350_Thumby_Color_DOOM
-```
-
-#### Step 1: Flash the game data (WHX file)
+**Step 2:** Flash game data (WHX file)
 ```powershell
 picotool load -v binaries/doom1.whx -t bin -o 0x10100000
 ```
 
-#### Step 2: Flash the program (UF2 file)
-Simply drag `binaries/thumbycolor-doom-rumble-sfx.uf2` onto the RPI-RP2 drive, or:
+**Step 3:** Flash program (UF2 file)
 ```powershell
 picotool load -v binaries/thumbycolor-doom-rumble-sfx.uf2
 picotool reboot
 ```
 
-**Alternative (no `cd`): use full paths**
+**Alternative:** If picotool is not in your PATH, use the full path:
 ```powershell
-picotool load -v "C:\path\to\RP2350_Thumby_Color_DOOM\binaries\doom1.whx" -t bin -o 0x10100000
-picotool load -v "C:\path\to\RP2350_Thumby_Color_DOOM\binaries\thumbycolor-doom-rumble-sfx.uf2"
-picotool reboot
+C:\path\to\picotool.exe load -v binaries/doom1.whx -t bin -o 0x10100000
+C:\path\to\picotool.exe load -v binaries/thumbycolor-doom-rumble-sfx.uf2
+C:\path\to\picotool.exe reboot
 ```
 
-### Quick Flash Script (Windows PowerShell)
-
-Run this from the repo root so the `binaries/` paths resolve, or edit the paths inside the script.
-
-```powershell
-# flash.ps1
-$ErrorActionPreference = "Stop"
-
-Write-Host "Flashing Thumby Color DOOM..." -ForegroundColor Cyan
-
-# Flash game data
-Write-Host "`n[1/2] Flashing doom1.whx to 0x10100000..." -ForegroundColor Yellow
-picotool load -v binaries/doom1.whx -t bin -o 0x10100000
-
-# Flash program
-Write-Host "`n[2/2] Flashing UF2..." -ForegroundColor Yellow
-picotool load -v binaries/thumbycolor-doom-rumble-sfx.uf2
-
-# Reboot
-Write-Host "`nRebooting Thumby Color..." -ForegroundColor Green
-picotool reboot
-
-Write-Host "`n✓ Flash complete! DOOM should start automatically." -ForegroundColor Green
-```
+---
 
 ## Troubleshooting
 
-**`picotool` not found**
-- Run it by full path (see prerequisites above), or add its folder to PATH.
+**❌ "picotool not found" or "command not found"**
+- Download picotool from: https://github.com/raspberrypi/picotool/releases
+- Either add it to your PATH, or run it with the full path: `C:\path\to\picotool.exe`
+- The flash.ps1 script will tell you if it can't find picotool
 
-**No rumble / no audio**
-- Confirm you flashed `binaries/thumbycolor-doom-rumble-sfx.uf2` (not a different UF2). This repo binary is the known-good rumble/audio build.
-- Rumble requires a motor connected to GPIO 5.
-- Audio requires GPIO 23 (PWM) and GPIO 20 (speaker enable) wired correctly.
-- If your hardware does not have rumble/audio, those features will not work.
+**❌ "No accessible RP2040 devices in BOOTSEL mode were found"**
+- Make sure you're holding the BOOT button while plugging in USB
+- The device should appear as "RPI-RP2" drive in File Explorer
+- Try a different USB cable or port
+
+**❌ Flash script won't run / "cannot be loaded because running scripts is disabled"**
+- PowerShell blocks scripts by default. Run this once:
+  ```powershell
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+  ```
+- Or run the script with: `powershell -ExecutionPolicy Bypass -File .\flash.ps1`
+
+**❌ No rumble / no audio**
+- Confirm you flashed `binaries/thumbycolor-doom-rumble-sfx.uf2` (not a different UF2)
+- Rumble requires a motor connected to GPIO 5
+- Audio requires GPIO 23 (PWM) and GPIO 20 (speaker enable) wired correctly
+- If your hardware doesn't have rumble/audio, those features simply won't work
+
+**❌ Game doesn't start after flashing**
+- Make sure you flashed BOTH files (WHX first, then UF2)
+- Try unplugging and replugging the device
+- Check that the WHX flashed to the correct address: `0x10100000`
 
 ## Controls
 
