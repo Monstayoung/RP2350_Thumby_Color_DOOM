@@ -12,13 +12,16 @@ DOOM port for Thumby Color (RP2350) running at 270MHz with rumble motor support 
 
 ## Hardware Requirements
 
-- Thumby Color (RP2350-ARM-S)
-- Rumble motor on GPIO 5
-- Audio: GPIO 23 (PWM), GPIO 20 (speaker enable)
+- **Thumby Color (RP2350-ARM-S)** - Stock hardware, no modifications needed!
+  - ✅ Works with original firmware (will be replaced by DOOM)
+  - ✅ Rumble motor (built-in, GPIO 5)
+  - ✅ Audio speaker (built-in, GPIO 23 PWM, GPIO 20 enable)
 
 ## Quick Start (3 Steps)
 
-**The easiest way to get DOOM running:**
+**The easiest way to get DOOM running on your stock Thumby Color:**
+
+> ✅ **Works on unmodified Thumby Color** - No hardware changes needed! Rumble and audio work out of the box.
 
 1. **Download this repository**
    - Click the green "Code" button → Download ZIP
@@ -119,9 +122,13 @@ C:\path\to\picotool.exe reboot
 
 **❌ No rumble / no audio**
 - Confirm you flashed `binaries/thumbycolor-doom-rumble-sfx.uf2` (not a different UF2)
-- Rumble requires a motor connected to GPIO 5
-- Audio requires GPIO 23 (PWM) and GPIO 20 (speaker enable) wired correctly
-- If your hardware doesn't have rumble/audio, those features simply won't work
+- Stock Thumby Color has rumble and audio built-in, so this should work automatically
+- If you modified your hardware or have an older prototype, check GPIO connections
+
+**❓ What happens to the original Thumby Color firmware?**
+- It gets replaced by DOOM (this is normal!)
+- To restore original firmware, re-flash it using the same process
+- Your Thumby Color is not permanently modified
 
 **❌ Game doesn't start after flashing**
 - Make sure you flashed BOTH files (WHX first, then UF2)
