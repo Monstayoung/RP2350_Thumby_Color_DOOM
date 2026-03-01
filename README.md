@@ -20,9 +20,10 @@ DOOM port for Thumby Color (RP2350) running at 270MHz with rumble motor support 
 
 **The easiest way to get DOOM running:**
 
-1. **Download/Clone this repository**
+1. **Download this repository**
    - Click the green "Code" button → Download ZIP
-   - Extract it anywhere on your computer
+   - Extract it anywhere (like your Desktop or Downloads folder)
+   - Remember where you extracted it!
 
 2. **Install picotool** (one-time setup)
    - Download from: https://github.com/raspberrypi/picotool/releases
@@ -30,8 +31,10 @@ DOOM port for Thumby Color (RP2350) running at 270MHz with rumble motor support 
 
 3. **Flash your Thumby Color**
    - Hold the **BOOT button** while plugging in USB (BOOTSEL mode)
-   - Open PowerShell in the extracted folder
-   - Run: `.\flash.ps1`
+   - **Open PowerShell:** Press `Windows Key`, type `powershell`, press Enter
+   - **Navigate to the folder:** Type `cd` then drag the extracted folder into PowerShell, press Enter
+     - Example: `cd C:\Users\YourName\Desktop\RP2350_Thumby_Color_DOOM`
+   - **Run the flash script:** Type `.\flash.ps1` and press Enter
    - Done! DOOM starts automatically
 
 **That's it!** The script handles everything automatically.
